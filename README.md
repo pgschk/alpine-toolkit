@@ -21,8 +21,8 @@ The following tools are currently included in Docker image `pgschk/alpine-toolki
 
 ## Extended images
 
-Additionally there is an extended image, which includes more tools, but of course is larger.
-The image `pgschk/alpine-toolkit:latest-extended` additionally includedes:
+Additionally there is an extended image, which includes more tools at the cost of being larger.
+The image `pgschk/alpine-toolkit:latest-extended` additionally includes:
 
 - mosquittio-clients (mosquitto_sub, mosquitto_pub)
 - strace
