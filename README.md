@@ -6,7 +6,7 @@
 
 # Alpine Toolkit
 
-An alpine container with some debugging tools installed.
+An alpine container with some debugging tools installed. For every release there is a normal container that includes only the essentials, as well as an extended container, which includes more tools at the cost of size.
 
 
 ## Included tools
@@ -24,7 +24,7 @@ The following tools are currently included in Docker image `pgschk/alpine-toolki
 Additionally there is an extended image, which includes more tools at the cost of being larger.
 The image `pgschk/alpine-toolkit:latest-extended` additionally includes:
 
-- mosquittio-clients (mosquitto_sub, mosquitto_pub)
+- mosquitto-clients (mosquitto_sub, mosquitto_pub)
 - strace
 
 
