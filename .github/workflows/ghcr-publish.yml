@@ -78,7 +78,7 @@ jobs:
 
       - name: Read extended packages file
         id: get-extended-packages
-        run: echo "::set-output name=extended-packages::$(tr '\n' ' ' < EXTENDED_PACKAGES)"
+        run: echo "extended-packages=$(tr '\n' ' ' < EXTENDED_PACKAGES)"" >> $GITHUB_OUTPUT)"
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
