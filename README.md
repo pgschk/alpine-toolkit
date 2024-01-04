@@ -6,3 +6,34 @@
 # Alpine Toolkit
 
 An alpine container with some debugging tools installed.
+
+## Included tools
+
+The following tools are currently included:
+
+- telnet
+- netcat
+- curl
+- tcpdump
+
+
+## Add additional tools
+
+To add more packages, build the container with the build argument "EXTRA_PACKAGES" set to a list of [Alpine packages](https://pkgs.alpinelinux.org/packages):
+
+```
+docker buildx build --build-arg EXTRA_PACKAGES="mosquitto-clients" -t alpine-toolkit:local .
+```
+
+
+## Use as Kubernetes debug
+
+You can use `kubernetes debug` to attach the container to an existing pod to get access to the debugging tools.
+
+### Example
+
+We will assume that our pod is named "my-pod" with a container "my-container", which we want to attach to:
+
+```
+kubectl debug -it my-pod --image=pgschk/alpine-toolkit --target=mycontainer
+```
