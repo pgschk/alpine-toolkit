@@ -3,18 +3,29 @@
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/pgschk/alpine-linux)
 [![Daily Vulnerability Scan](https://github.com/pgschk/alpine-toolkit/actions/workflows/trivy-schedule.yml/badge.svg)](https://github.com/pgschk/alpine-toolkit/actions/workflows/trivy-schedule.yml)
 
+
 # Alpine Toolkit
 
 An alpine container with some debugging tools installed.
 
+
 ## Included tools
 
-The following tools are currently included:
+The following tools are currently included in Docker image `pgschk/alpine-toolkit:latest`:
 
 - telnet
 - netcat
 - curl
 - tcpdump
+
+
+## Extended images
+
+Additionally there is an extended image, which includes more tools, but of course is larger.
+The image `pgschk/alpine-toolkit:latest-extended` additionally includedes:
+
+- mosquittio-clients (mosquitto_sub, mosquitto_pub)
+- strace
 
 
 ## Add additional tools
