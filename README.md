@@ -28,7 +28,7 @@ docker buildx build --build-arg EXTRA_PACKAGES="mosquitto-clients" -t alpine-too
 
 ## Use as Kubernetes debug
 
-You can use `kubernetes debug` to attach the container to an existing pod to get access to the debugging tools.
+You can use `kubectl debug` to attach the container to an existing pod to get access to the debugging tools.
 
 ### Example
 
