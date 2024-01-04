@@ -101,7 +101,7 @@ jobs:
         with:
           context: .
           build-args: |
-            EXTRA_PACKAGES=${{ steps. get-extended-packages.outputs.extended-packages }}
+            EXTRA_PACKAGES=${{ steps.get-extended-packages.outputs.extended-packages }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta-extended.outputs.tags }}
           labels: ${{ steps.meta-extended.outputs.labels }}
