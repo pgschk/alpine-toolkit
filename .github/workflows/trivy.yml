@@ -27,6 +27,8 @@ jobs:
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09
         with:
           context: .
+          build-args: |
+            EXTRA_PACKAGES=mosquitto-clients strace
           push: false
           load: true
           tags: 'pgschk/alpine-tookit:${{ github.sha }}'

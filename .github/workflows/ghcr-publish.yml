@@ -98,7 +98,7 @@ jobs:
         with:
           context: .
           build-args: |
-            EXTRA_PACKAGES="mosquitto-clients strace"
+            EXTRA_PACKAGES=mosquitto-clients strace
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta-extended.outputs.tags }}
           labels: ${{ steps.meta-extended.outputs.labels }}

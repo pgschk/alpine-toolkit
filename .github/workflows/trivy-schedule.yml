@@ -4,7 +4,7 @@ on:
     - cron: '12 14 * * *'
 
 env:
-  IMAGE_TAG: latest
+  IMAGE_TAG: latest-extended
 
 jobs:
   scan:
