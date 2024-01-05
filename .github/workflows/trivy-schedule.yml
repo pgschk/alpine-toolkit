@@ -4,7 +4,9 @@ on:
     - cron: '12 14 * * *'
 
 env:
+  IMAGE_NAME: pgschk/alpine-tookit
   IMAGE_TAG: latest-extended
+  SEVERITY: 'CRITICAL,HIGH'
 
 jobs:
   scan:
@@ -14,9 +16,9 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'pgschk/alpine-tookit:${IMAGE_TAG}'
+          image-ref: '${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          severity: ${{ env.SEVERITY }}
