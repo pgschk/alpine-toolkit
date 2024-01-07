@@ -188,7 +188,7 @@ jobs:
           COSIGN_EXPERIMENTAL: 1
 
       - name: Sign extended container image (keyless)
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           cosign sign -y ${{ steps.build_image_extended.outputs.image-with-tag }}@${{ steps.push-extended.outputs.digest }}
         env:
