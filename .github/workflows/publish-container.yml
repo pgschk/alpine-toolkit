@@ -73,14 +73,6 @@ jobs:
           extra-args: |
             --pull
 
-      # Run container-structure-test
-      # https://github.com/marketplace/actions/container-structure-test-action
-      - name: Run container-structure-tests
-        uses: plexsystems/container-structure-test-action@v0.3.0
-        with:
-          image: ${{ steps.docker-metadata.outputs.tags[0] }}
-          config: test/container-structure-test/tests.yml
-
       - name: Echo Outputs
         run: |
           echo "Image: ${{ steps.build_image.outputs.image }}"
@@ -98,6 +90,14 @@ jobs:
           buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.description"'
           buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
           buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
+
+      # Run container-structure-test
+      # https://github.com/marketplace/actions/container-structure-test-action
+      - name: Run container-structure-tests
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ${{ steps.build_image.outputs.image-with-tag }}
+          config: test/container-structure-test/tests.yml
 
       # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
       # in which case 'username' and 'password' can be omitted.
