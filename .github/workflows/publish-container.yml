@@ -93,6 +93,10 @@ jobs:
           buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
           buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
 
+      - name: Export image to docker
+        run: |
+          buildah push ${{ steps.build_image.outputs.image-with-tag }} docker-daemon:${{ steps.build_image.outputs.image-with-tag }}
+
       # Run container-structure-test
       # https://github.com/marketplace/actions/container-structure-test-action
       - name: Run container-structure-tests
