@@ -31,14 +31,14 @@ jobs:
             EXTRA_PACKAGES=mosquitto-clients strace
           push: false
           load: true
-          tags: 'pgschk/alpine-tookit:${{ github.sha }}'
+          tags: 'pgschk/alpine-toolkit:${{ github.sha }}'
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'pgschk/alpine-tookit:${{ github.sha }}'
+          image-ref: 'pgschk/alpine-toolkit:${{ github.sha }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true

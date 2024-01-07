@@ -1,10 +1,10 @@
 name: Daily Vulnerability Scan
 on:
   schedule:
-    - cron: '12 14 * * *'
+    - cron: '49 15 * * *'
 
 env:
-  IMAGE_NAME: pgschk/alpine-tookit
+  IMAGE_NAME: pgschk/alpine-toolkit
   IMAGE_TAG: latest-extended
   SEVERITY: 'CRITICAL,HIGH'
 
