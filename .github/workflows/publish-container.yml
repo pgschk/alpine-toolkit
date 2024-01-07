@@ -61,9 +61,9 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
-            flavor: |
-              latest=auto
-              suffix=-extended,onlatest=true
+          flavor: |
+            latest=auto
+            suffix=-extended,onlatest=true
 
       - name: Read extended packages file
         id: get-extended-packages
