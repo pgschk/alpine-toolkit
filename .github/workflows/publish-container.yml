@@ -46,6 +46,25 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
 
+      - name: Docker Metadata Extended image
+        id: docker-metadata-extended
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ env.IMAGES }}
+          tags: |
+            type=edge
+            type=sha
+            type=ref,event=branch
+            type=ref,event=pr
+            type=schedule
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
+            flavor: |
+              latest=auto
+              suffix=-extended,onlatest=true
+
       - name: Read extended packages file
         id: get-extended-packages
         run: echo "extended-packages=$(tr '\n' ' ' < EXTENDED_PACKAGES)" >> $GITHUB_OUTPUT
@@ -63,11 +82,29 @@ jobs:
           extra-args: |
             --pull
 
+      # Build enhanced image using Buildah action
+      - name: Build extended Image
+        id: build_image_extended
+        uses: redhat-actions/buildah-build@v2
+        with:
+          layers: false
+          tags: ${{ steps.docker-metadata-extended.outputs.tags }}
+          labels: ${{ steps.docker-metadata-extended.outputs.labels }}
+          containerfiles: |
+            ./Dockerfile
+          extra-args: |
+            --pull
+          build-args: |
+            EXTRA_PACKAGES=${{ steps.get-extended-packages.outputs.extended-packages }}
+
       - name: Echo Outputs
         run: |
           echo "Image: ${{ steps.build_image.outputs.image }}"
           echo "Tags: ${{ steps.build_image.outputs.tags }}"
           echo "Tagged Image: ${{ steps.build_image.outputs.image-with-tag }}"
+          echo "Extended Image: ${{ steps.build_image_extended.outputs.image }}"
+          echo "Tags: ${{ steps.build_image_extended.outputs.tags }}"
+          echo "Tagged Image: ${{ steps.build_image_extended.outputs.image-with-tag }}"
 
       # Check if image is build
       - name: Check images created
@@ -80,10 +117,15 @@ jobs:
           buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.description"'
           buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
           buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
+          buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.title"'
+          buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.description"'
+          buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
+          buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
 
       - name: Export image to docker
         run: |
           buildah push ${{ steps.build_image.outputs.image-with-tag }} docker-daemon:${{ steps.build_image.outputs.image-with-tag }}
+          buildah push ${{ steps.build_image_extended.outputs.image-with-tag }} docker-daemon:${{ steps.build_image_extended.outputs.image-with-tag }}
 
       - name: Podman log in to docker.io
         uses: redhat-actions/podman-login@v1
@@ -121,9 +163,19 @@ jobs:
           image: ${{ steps.build_image.outputs.image }}
           tags: ${{ steps.build_image.outputs.tags }}
 
+      - name: Push extended Images
+        id: push-extended
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build_image_extended.outputs.image }}
+          tags: ${{ steps.build_image_extended.outputs.tags }}
+
       - name: Print image url
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
-        run: echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
+        run: |
+          echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
+          echo "Image pushed to ${{ steps.push-extended.outputs.registry-paths }}"
 
       - uses: sigstore/cosign-installer@v3.3.0
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
@@ -132,5 +184,12 @@ jobs:
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
         run: |
           cosign sign -y ${{ steps.build_image.outputs.image-with-tag }}@${{ steps.push.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: 1
+
+      - name: Sign extended container image (keyless)
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+        run: |
+          cosign sign -y ${{ steps.build_image_extended.outputs.image-with-tag }}@${{ steps.push-extended.outputs.digest }}
         env:
           COSIGN_EXPERIMENTAL: 1
