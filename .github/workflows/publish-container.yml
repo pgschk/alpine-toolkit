@@ -85,22 +85,35 @@ jobs:
         run: |
           buildah push ${{ steps.build_image.outputs.image-with-tag }} docker-daemon:${{ steps.build_image.outputs.image-with-tag }}
 
-      - name: Log in to docker.io
+      - name: Podman log in to docker.io
         uses: redhat-actions/podman-login@v1
         with:
           registry: docker.io
           username: ${{ github.actor }}
           password: ${{ secrets.DOCKER_LOGIN }}
-      - name: Log in to ghcr.io
+
+      - name: Podman log in to ghcr.io
         uses: redhat-actions/podman-login@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
-      # in which case 'username' and 'password' can be omitted.
-      - name: Push To ghcr.io
+      - name: Docker log in to docker.io
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKER_LOGIN }}
+
+      - name: Docker log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Images
         id: push
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
         uses: redhat-actions/push-to-registry@v2
@@ -108,7 +121,7 @@ jobs:
           image: ${{ steps.build_image.outputs.image }}
           tags: ${{ steps.build_image.outputs.tags }}
 
-      - name: Print ghcr.io image url
+      - name: Print image url
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
         run: echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
 
