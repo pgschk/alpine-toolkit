@@ -157,7 +157,7 @@ jobs:
 
       - name: Push Images
         id: push
-        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.event_name != 'pull_request' }}
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build_image.outputs.image }}
@@ -165,23 +165,23 @@ jobs:
 
       - name: Push extended Images
         id: push-extended
-        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.event_name != 'pull_request' }}
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build_image_extended.outputs.image }}
           tags: ${{ steps.build_image_extended.outputs.tags }}
 
       - name: Print image url
-        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
           echo "Image pushed to ${{ steps.push-extended.outputs.registry-paths }}"
 
       - uses: sigstore/cosign-installer@v3.3.0
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+        if: ${{ github.event_name != 'pull_request' }}
 
       - name: Sign container image (keyless)
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           cosign sign -y ${{ steps.build_image.outputs.image-with-tag }}@${{ steps.push.outputs.digest }}
         env:
