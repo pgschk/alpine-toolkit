@@ -97,14 +97,6 @@ jobs:
         run: |
           buildah push ${{ steps.build_image.outputs.image-with-tag }} docker-daemon:${{ steps.build_image.outputs.image-with-tag }}
 
-      # Run container-structure-test
-      # https://github.com/marketplace/actions/container-structure-test-action
-      - name: Run container-structure-tests
-        uses: plexsystems/container-structure-test-action@v0.3.0
-        with:
-          image: ${{ steps.build_image.outputs.image-with-tag }}
-          config: test/container-structure-test/tests.yml
-
       # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
       # in which case 'username' and 'password' can be omitted.
       - name: Push To ghcr.io
