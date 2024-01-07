@@ -73,6 +73,14 @@ jobs:
           extra-args: |
             --pull
 
+      # Run container-structure-test
+      # https://github.com/marketplace/actions/container-structure-test-action
+      - name: Run container-structure-tests
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ${{ steps.docker-metadata.outputs.tags[0] }}
+          config: test/container-structure-test/tests.yml
+
       - name: Echo Outputs
         run: |
           echo "Image: ${{ steps.build_image.outputs.image }}"
