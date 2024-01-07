@@ -30,14 +30,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Install the cosign tool except on PR
-      # https://github.com/sigstore/cosign-installer
-      - name: Install cosign
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@6e04d228eb30da1757ee4e1dd75a0ec73a653e06 #v3.1.1
-        with:
-          cosign-release: 'v2.1.1'
-
       - name: Docker Metadata
         id: docker-metadata
         uses: docker/metadata-action@v4
@@ -109,7 +101,7 @@ jobs:
       # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
       # in which case 'username' and 'password' can be omitted.
       - name: Push To ghcr.io
-        id: push-to-ghcr
+        id: push
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
         uses: redhat-actions/push-to-registry@v2
         with:
@@ -118,17 +110,14 @@ jobs:
 
       - name: Print ghcr.io image url
         if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
-        run: echo "Image pushed to ${{ steps.push-to-ghcr.outputs.registry-paths }}"
+        run: echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
 
-      # Sign the resulting Docker image digest except on PRs.
-      # This will only write to the public Rekor transparency log when the Docker
-      # repository is public to avoid leaking data.  If you would like to publish
-      # transparency data even for private images, pass --force to cosign below.
-      # https://github.com/sigstore/cosign
-      - name: Sign the published Docker image
-        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+      - uses: sigstore/cosign-installer@v3.3.0
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+
+      - name: Sign container image (keyless)
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+        run: |
+          cosign sign -y ${{ steps.build_image.outputs.image-with-tag }}@${{ steps.push.outputs.digest }}
         env:
-          COSIGN_EXPERIMENTAL: "true"
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
-        run: echo "${{ steps.docker-metadata.outputs.tags }}" | xargs -I {} cosign sign --yes {}@${{ steps.build_image.outputs.image-with-tag }}
+          COSIGN_EXPERIMENTAL: 1
