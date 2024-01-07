@@ -63,7 +63,7 @@ jobs:
       # Build image using Buildah action
       - name: Build Image
         id: build_image
-        uses: ./
+        uses: redhat-actions/buildah-build@v2
         with:
           layers: false
           tags: ${{ steps.docker-metadata.outputs.tags }}
