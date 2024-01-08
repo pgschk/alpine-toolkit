@@ -11,6 +11,8 @@ env:
 
 jobs:
   scan:
+    permissions:
+      statuses: write
     name: Daily Trivy Vulnerability Scan
     runs-on: ubuntu-latest
     steps:
