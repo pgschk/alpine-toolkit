@@ -37,6 +37,8 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.16.1
+        env:
+          TRIVY_OFFLINE_SCAN: true
         with:
           image-ref: 'pgschk/alpine-toolkit:${{ github.sha }}'
           format: 'table'
