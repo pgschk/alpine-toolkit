@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.16.1
+        env:
+          TRIVY_OFFLINE_SCAN: true
         with:
           image-ref: '${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}'
           exit-code: '1'
