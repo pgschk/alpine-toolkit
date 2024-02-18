@@ -69,6 +69,11 @@ jobs:
         id: get-extended-packages
         run: echo "extended-packages=$(tr '\n' ' ' < EXTENDED_PACKAGES)" >> $GITHUB_OUTPUT
 
+      - name: Install qemu dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
+
       # Build image using Buildah action
       - name: Build Image
         id: build_image
@@ -77,6 +82,7 @@ jobs:
           layers: false
           tags: ${{ steps.docker-metadata.outputs.tags }}
           labels: ${{ steps.docker-metadata.outputs.labels }}
+          archs: amd64, arm64
           containerfiles: |
             ./Dockerfile
           extra-args: |
@@ -90,6 +96,7 @@ jobs:
           layers: false
           tags: ${{ steps.docker-metadata-extended.outputs.tags }}
           labels: ${{ steps.docker-metadata-extended.outputs.labels }}
+          archs: amd64, arm64
           containerfiles: |
             ./Dockerfile
           extra-args: |
