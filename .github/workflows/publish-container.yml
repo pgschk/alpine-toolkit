@@ -82,7 +82,7 @@ jobs:
           layers: false
           tags: ${{ steps.docker-metadata.outputs.tags }}
           labels: ${{ steps.docker-metadata.outputs.labels }}
-          platform: linux/amd64, linux/arm64
+          platform: linux/amd64, linux/arm64/v8, linux/arm64/v7
           containerfiles: |
             ./Dockerfile
           extra-args: |
@@ -96,7 +96,7 @@ jobs:
           layers: false
           tags: ${{ steps.docker-metadata-extended.outputs.tags }}
           labels: ${{ steps.docker-metadata-extended.outputs.labels }}
-          platform: linux/amd64, linux/arm64
+          platform: linux/amd64, linux/arm64/v8, linux/arm64/v7
           containerfiles: |
             ./Dockerfile
           extra-args: |
