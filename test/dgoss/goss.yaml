@@ -1,0 +1,25 @@
+package:
+  curl:
+    installed: true
+    versions:
+    - 8.5.0-r0
+  inetutils-telnet:
+    installed: true
+    versions:
+    - 2.4-r0
+  nano:
+    installed: true
+    versions:
+    - 7.2-r1
+  netcat-openbsd:
+    installed: true
+    versions:
+    - 1.226-r0
+  openssl:
+    installed: true
+    versions:
+    - 3.1.4-r5
+  tcpdump:
+    installed: true
+    versions:
+    - 4.99.4-r1
