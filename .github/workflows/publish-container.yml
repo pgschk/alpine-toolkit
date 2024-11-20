@@ -129,11 +129,6 @@ jobs:
           docker pull ghcr.io/pgschk/alpine-toolkit@${{ steps.build-image.outputs.digest }}
           docker pull ghcr.io/pgschk/alpine-toolkit@${{ steps.build-image-extended.outputs.digest }}
 
-      - name: Echo Outputs
-        run: |
-          echo "Default: ${{ steps.build-image.outputs.metadata }}
-          echo "Extended: ${{ steps.build-image-extended.outputs.metadata }}"
-
       # Check if image is build
       # - name: Check images created
       #   run: buildah images | grep '${{ env.IMAGES }}'
