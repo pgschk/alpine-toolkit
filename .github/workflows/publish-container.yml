@@ -126,7 +126,8 @@ jobs:
       - name: Pull images
         shell: bash
         run: |
-          docker pull $(${{ env.IMAGES }} | head -1):${{ steps.build-image.outputs.digest }}
+          docker pull $(${{ env.IMAGES }} | head -1 | echo -n):${{ steps.build-image.outputs.digest }}
+          docker pull $(${{ env.IMAGES }} | head -1 | echo -n):${{ steps.build-image-extended.outputs.digest }}
 
       - name: Echo Outputs
         run: |
