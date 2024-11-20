@@ -11,8 +11,8 @@ on:
 
 env:
   IMAGES: |
-    docker.io/pgschk/alpine-toolkit
     ghcr.io/pgschk/alpine-toolkit
+    docker.io/pgschk/alpine-toolkit
 
 jobs:
   build:
@@ -126,8 +126,8 @@ jobs:
       - name: Pull images
         shell: bash
         run: |
-          docker pull $(${{ env.IMAGES }} | head -1 | echo -n):${{ steps.build-image.outputs.digest }}
-          docker pull $(${{ env.IMAGES }} | head -1 | echo -n):${{ steps.build-image-extended.outputs.digest }}
+          docker pull $(cat ${{ env.IMAGES }} | head -1 | echo -n):${{ steps.build-image.outputs.digest }}
+          docker pull $(cat ${{ env.IMAGES }} | head -1 | echo -n):${{ steps.build-image-extended.outputs.digest }}
 
       - name: Echo Outputs
         run: |
