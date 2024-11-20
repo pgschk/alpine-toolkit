@@ -28,11 +28,25 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker Metadata
         id: docker-metadata
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             ${{ env.IMAGES }}
@@ -48,7 +62,7 @@ jobs:
 
       - name: Docker Metadata Extended image
         id: docker-metadata-extended
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             ${{ env.IMAGES }}
@@ -69,120 +83,71 @@ jobs:
         id: get-extended-packages
         run: echo "extended-packages=$(tr '\n' ' ' < EXTENDED_PACKAGES)" >> $GITHUB_OUTPUT
 
-      - name: Install qemu dependency
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-static
+      - name: Install QEMU
+        uses: docker/setup-qemu-action@v3
 
-      # Build image using Buildah action
-      - name: Build Image
-        id: build_image
-        uses: redhat-actions/buildah-build@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
         with:
-          layers: false
+          path: /tmp/.buildx-cache/alpine-toolkit
+          key: ${{ runner.os }}-buildx-alpine-toolkit
+          restore-keys: |
+              ${{ runner.os }}-buildx-
+
+      - name: Build container image
+        id: build-image
+        uses: docker/build-push-action@v6
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          platforms: linux/amd64,linux/ppc64le,linux/s390x,linux/arm64
           tags: ${{ steps.docker-metadata.outputs.tags }}
           labels: ${{ steps.docker-metadata.outputs.labels }}
-          archs: amd64, ppc64le, s390x, arm64
-          containerfiles: |
-            ./Dockerfile
-          extra-args: |
-            --pull
+          cache-from: type=local,src=/tmp/.buildx-cache/alpine-toolkit
+          cache-to: type=local,dest=/tmp/.buildx-cache/alpine-toolkit-new
 
-      # Build enhanced image using Buildah action
-      - name: Build extended Image
-        id: build_image_extended
-        uses: redhat-actions/buildah-build@v2
+      - name: Build extended container image
+        id: build-image-extended
+        uses: docker/build-push-action@v6
         with:
-          layers: false
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          platforms: linux/amd64,linux/ppc64le,linux/s390x,linux/arm64
           tags: ${{ steps.docker-metadata-extended.outputs.tags }}
           labels: ${{ steps.docker-metadata-extended.outputs.labels }}
-          archs: amd64, ppc64le, s390x, arm64
-          containerfiles: |
-            ./Dockerfile
-          extra-args: |
-            --pull
-          build-args: |
-            EXTRA_PACKAGES=${{ steps.get-extended-packages.outputs.extended-packages }}
+          cache-from: type=local,src=/tmp/.buildx-cache/alpine-toolkit
+          cache-to: type=local,dest=/tmp/.buildx-cache/alpine-toolkit-new
+          build-args: EXTRA_PACKAGES=${{ steps.get-extended-packages.outputs.extended-packages }}
+
+      - name: Pull images
+        shell: bash
+        run: |
+          docker pull $(${{ env.IMAGES }} | head -1:${{ steps.outputs.build-image.digest }}
 
       - name: Echo Outputs
         run: |
-          echo "Image: ${{ steps.build_image.outputs.image }}"
-          echo "Tags: ${{ steps.build_image.outputs.tags }}"
-          echo "Tagged Image: ${{ steps.build_image.outputs.image-with-tag }}"
-          echo "Extended Image: ${{ steps.build_image_extended.outputs.image }}"
-          echo "Tags: ${{ steps.build_image_extended.outputs.tags }}"
-          echo "Tagged Image: ${{ steps.build_image_extended.outputs.image-with-tag }}"
+          echo "Default: ${{ steps.build-image.outputs.metadata }}
+          echo "Extended: ${{ steps.build-image-extended.outputs.metadata }}"
 
       # Check if image is build
-      - name: Check images created
-        run: buildah images | grep '${{ env.IMAGES }}'
+      # - name: Check images created
+      #   run: buildah images | grep '${{ env.IMAGES }}'
 
-      - name: Check image metadata
-        run: |
-          set -x
-          buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.title"'
-          buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.description"'
-          buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
-          buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
-          buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.title"'
-          buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.description"'
-          buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
-          buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
-
-      - name: Export image to docker
-        run: |
-          buildah push ${{ steps.build_image.outputs.image-with-tag }} docker-daemon:${{ steps.build_image.outputs.image-with-tag }}
-          buildah push ${{ steps.build_image_extended.outputs.image-with-tag }} docker-daemon:${{ steps.build_image_extended.outputs.image-with-tag }}
-
-      - name: Podman log in to docker.io
-        uses: redhat-actions/podman-login@v1
-        with:
-          registry: docker.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.DOCKER_LOGIN }}
-
-      - name: Podman log in to ghcr.io
-        uses: redhat-actions/podman-login@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker log in to docker.io
-        uses: docker/login-action@v3
-        with:
-          registry: docker.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.DOCKER_LOGIN }}
-
-      - name: Docker log in to ghcr.io
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push Images
-        id: push
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build_image.outputs.image }}
-          tags: ${{ steps.build_image.outputs.tags }}
-
-      - name: Push extended Images
-        id: push-extended
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build_image_extended.outputs.image }}
-          tags: ${{ steps.build_image_extended.outputs.tags }}
-
-      - name: Print image url
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
-          echo "Image pushed to ${{ steps.push-extended.outputs.registry-paths }}"
+      # - name: Check image metadata
+      #   run: |
+      #     set -x
+      #     buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.title"'
+      #     buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.description"'
+      #     buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
+      #     buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
+      #     buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.title"'
+      #     buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.description"'
+      #     buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
+      #     buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
 
       - uses: sigstore/cosign-installer@v3.3.0
         if: ${{ github.event_name != 'pull_request' }}
@@ -190,13 +155,13 @@ jobs:
       - name: Sign container image (keyless)
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          cosign sign -y ${{ steps.build_image.outputs.image-with-tag }}@${{ steps.push.outputs.digest }}
+          cosign sign -y ${{ steps.build-image.outputs.digest }}
         env:
           COSIGN_EXPERIMENTAL: 1
 
       - name: Sign extended container image (keyless)
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          cosign sign -y ${{ steps.build_image_extended.outputs.image-with-tag }}@${{ steps.push-extended.outputs.digest }}
+          cosign sign -y ${{ steps.build-image.outputs.digest }}
         env:
           COSIGN_EXPERIMENTAL: 1
