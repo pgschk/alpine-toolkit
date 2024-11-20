@@ -1,6 +1,5 @@
 [![Container CI](https://github.com/pgschk/alpine-toolkit/actions/workflows/publish-container.yml/badge.svg)](https://github.com/pgschk/alpine-toolkit/actions/workflows/publish-container.yml)
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/pgschk/alpine-toolkit)
-[![Daily Vulnerability Scan](https://github.com/pgschk/alpine-toolkit/actions/workflows/trivy-schedule.yml/badge.svg)](https://github.com/pgschk/alpine-toolkit/actions/workflows/trivy-schedule.yml)
 
 # Alpine Toolkit
 
