@@ -126,8 +126,8 @@ jobs:
       - name: Pull images
         shell: bash
         run: |
-          docker pull $(echo ${{ env.IMAGES }} | head -1 | xargs | echo -n):${{ steps.build-image.outputs.digest }}
-          docker pull $(echo ${{ env.IMAGES }} | head -1 | xargs | echo -n):${{ steps.build-image-extended.outputs.digest }}
+          docker pull ghcr.io/pgschk/alpine-toolkit:${{ steps.build-image.outputs.digest }}
+          docker pull ghcr.io/pgschk/alpine-toolkit:${{ steps.build-image-extended.outputs.digest }}
 
       - name: Echo Outputs
         run: |
@@ -163,6 +163,6 @@ jobs:
       - name: Sign extended container image (keyless)
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          cosign sign -y ${{ steps.build-image.outputs.digest }}
+          cosign sign -y ${{ steps.build-image-extended.outputs.digest }}
         env:
           COSIGN_EXPERIMENTAL: 1
