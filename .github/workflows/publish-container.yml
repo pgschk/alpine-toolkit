@@ -167,7 +167,7 @@ jobs:
           COSIGN_EXPERIMENTAL: 1
 
       - name: Verify image
-        run: cosign verify --certificate-identity "https://github.com/pgschk/alpine-toolkit" --certificate-oidc-issuer="https://github.com/login/oauth" ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@${DIGEST}
+        run: cosign verify --certificate-identity "https://github.com/pgschk/alpine-toolkit/.github/workflows/publish-container.yml@refs/heads/main" --certificate-oidc-issuer="https://token.actions.githubusercontent.com" ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@${DIGEST}
         env:
           DIGEST: ${{ needs.build.outputs.digest }}
           COSIGN_EXPERIMENTAL: 1
@@ -179,7 +179,7 @@ jobs:
           COSIGN_EXPERIMENTAL: 1
 
       - name: Verify pushed extended image
-        run: cosign verify --certificate-identity "https://github.com/pgschk/alpine-toolkit" --certificate-oidc-issuer="https://github.com/login/oauth" ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@${DIGEST}
+        run: cosign verify --certificate-identity "https://github.com/pgschk/alpine-toolkit/.github/workflows/publish-container.yml@refs/heads/main" --certificate-oidc-issuer="https://token.actions.githubusercontent.com" ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@${DIGEST}
         env:
           DIGEST: ${{ needs.build.outputs.digest-extended }}
           COSIGN_EXPERIMENTAL: 1
