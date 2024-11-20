@@ -161,7 +161,7 @@ jobs:
       - uses: sigstore/cosign-installer@v3
 
       - name: Sign image
-        run: cosign sign ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@${DIGEST} --yes
+        run: cosign sign --yes ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@${DIGEST}
         env:
           DIGEST: ${{ needs.build.outputs.digest }}
           COSIGN_EXPERIMENTAL: 1
@@ -173,7 +173,7 @@ jobs:
           COSIGN_EXPERIMENTAL: 1
 
       - name: Sign extended image
-        run: cosign sign ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@${DIGEST} --yes
+        run: cosign sign --yes ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@${DIGEST}
         env:
           DIGEST: ${{ needs.build.outputs.digest-extended }}
           COSIGN_EXPERIMENTAL: 1
