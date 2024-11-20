@@ -129,25 +129,11 @@ jobs:
           docker pull ghcr.io/pgschk/alpine-toolkit@${{ steps.build-image.outputs.digest }}
           docker pull ghcr.io/pgschk/alpine-toolkit@${{ steps.build-image-extended.outputs.digest }}
 
-      # Check if image is build
-      # - name: Check images created
-      #   run: buildah images | grep '${{ env.IMAGES }}'
-
-      # - name: Check image metadata
-      #   run: |
-      #     set -x
-      #     buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.title"'
-      #     buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.description"'
-      #     buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
-      #     buildah inspect ${{ steps.build_image.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
-      #     buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.title"'
-      #     buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.OCIv1.config.Labels."org.opencontainers.image.description"'
-      #     buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.title"'
-      #     buildah inspect ${{ steps.build_image_extended.outputs.image-with-tag }} | jq '.Docker.config.Labels."org.opencontainers.image.description"'
-
     outputs:
       tags: ${{ steps.docker-metadata.outputs.tags }}
       tags-extended: ${{ steps.docker-metadata.outputs.tags }}
+      digest: ${{ steps.build-image.outputs.digest }}
+      digest-extended: ${{ steps.build-image-extended.outputs.digest }}
 
   sign:
     if: ${{ github.event_name != 'pull_request' }}
@@ -175,25 +161,25 @@ jobs:
       - uses: sigstore/cosign-installer@v3
 
       - name: Sign images
-        run: cosign sign ${TAGS}
+        run: cosign sign ${DIGEST} --yes
         env:
-          TAGS: ${{ needs.build.outputs.tags }}
+          DIGEST: ${{ needs.build.outputs.digest }}
           COSIGN_EXPERIMENTAL: 1
 
-      - name: Verify pushed tags
-        run: cosign verify ${TAGS}
+      - name: Verify pushed image
+        run: cosign verify ${DIGEST}
         env:
-          TAGS: ${{ needs.build.outputs.tags }}
+          DIGEST: ${{ needs.build.outputs.digest }}
           COSIGN_EXPERIMENTAL: 1
 
       - name: Sign extended images
-        run: cosign sign ${TAGS}
+        run: cosign sign ${DIGEST} --yes
         env:
-          TAGS: ${{ needs.build.outputs.tags-extended }}
+          DIGEST: ${{ needs.build.outputs.digest-extended }}
           COSIGN_EXPERIMENTAL: 1
 
-      - name: Verify pushed extended tags
-        run: cosign verify ${TAGS}
+      - name: Verify pushed extended image
+        run: cosign verify ${DIGEST}
         env:
-          TAGS: ${{ needs.build.outputs.tags-extended }}
+          DIGEST: ${{ needs.build.outputs.digest-extended }}
           COSIGN_EXPERIMENTAL: 1
