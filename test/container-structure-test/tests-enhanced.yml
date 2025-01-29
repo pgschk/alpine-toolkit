@@ -1,37 +1,39 @@
 schemaVersion: 2.0.0
 commandTests:
-  - name: "telnet in version 2.4 installed"
+  - name: "telnet in version 2.5 installed"
     command: "telnet"
     args: ["-V"]
     expectedOutput:
-    - "2.4"
+    - "2.5"
   - name: "netcat in version 1.226 installed"
     command: "nc"
     args: ["-h"]
-    expectedOutput:
-    - "OpenBSD netcat (Debian patchlevel 1.226)"
-  - name: "curl in version 8.5.0 installed"
+    expectedError:
+    - "OpenBSD netcat \\(Debian patchlevel 1.226\\)"
+  - name: "curl in version 8.11.1 installed"
     command: "curl"
-    args: ["-v"]
+    args: ["-V"]
     expectedOutput:
-    - "curl 8.5.0 (x86_64-alpine-linux-musl)"
+    - "curl 8.11.1"
   - name: "tcpdump in version 4.99.4 installed"
     command: "tcpdump"
-    args: ["-h"]
+    args: ["--version"]
     expectedOutput:
     - "tcpdump version 4.99.4"
   - name: "mosquitto_sub in version 2.0.18 installed"
     command: "mosquitto_sub"
     args: ["--help"]
+    exitCode: 1
     expectedOutput:
     - "mosquitto_sub version 2.0.18 running on libmosquitto 2.0.18."
   - name: "mosquitto_pub in version 2.0.18 installed"
     command: "mosquitto_pub"
     args: ["--help"]
+    exitCode: 1
     expectedOutput:
     - "mosquitto_pub version 2.0.18 running on libmosquitto 2.0.18."
-  - name: "strace in version 6.6 installed"
+  - name: "strace in version 6.9 installed"
     command: "strace"
     args: ["-V"]
     expectedOutput:
-    - "strace -- version 6.6"
+    - "strace -- version 6.9"
