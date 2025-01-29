@@ -135,7 +135,7 @@ jobs:
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: ghcr.io/${{ github.repository }}@{{ steps.build-image.outputs.digest }}
-          config: tests/container-structure-test/tests.yml
+          config: test/container-structure-test/tests.yml
 
       # Run container-structure-test
       # https://github.com/marketplace/actions/container-structure-test-action
@@ -143,7 +143,7 @@ jobs:
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: ghcr.io/${{ github.repository }}@${{ steps.build-image-extended.outputs.digest }}
-          config: tests/container-structure-test/tests-enhanced.yml
+          config: test/container-structure-test/tests-enhanced.yml
 
     outputs:
       tags: ${{ steps.docker-metadata.outputs.tags }}
