@@ -8,8 +8,8 @@ commandTests:
   - name: "netcat in version 1.226 installed"
     command: "nc"
     args: ["-h"]
-    expectedOutput:
-    - "OpenBSD netcat (Debian patchlevel 1.226)"
+    expectedError:
+    - "OpenBSD netcat \\(Debian patchlevel 1.226\\)"
   - name: "curl in version 8.11.1 installed"
     command: "curl"
     args: ["-V"]
