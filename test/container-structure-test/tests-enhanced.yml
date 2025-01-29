@@ -12,12 +12,12 @@ commandTests:
     - "OpenBSD netcat (Debian patchlevel 1.226)"
   - name: "curl in version 8.5.0 installed"
     command: "curl"
-    args: ["-v"]
+    args: ["-V"]
     expectedOutput:
     - "curl 8.5.0 (x86_64-alpine-linux-musl)"
   - name: "tcpdump in version 4.99.4 installed"
     command: "tcpdump"
-    args: ["-h"]
+    args: ["--version"]
     expectedOutput:
     - "tcpdump version 4.99.4"
   - name: "mosquitto_sub in version 2.0.18 installed"
