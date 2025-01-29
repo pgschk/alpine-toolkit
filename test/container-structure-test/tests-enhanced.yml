@@ -23,11 +23,13 @@ commandTests:
   - name: "mosquitto_sub in version 2.0.18 installed"
     command: "mosquitto_sub"
     args: ["--help"]
+    exitCode: 1
     expectedOutput:
     - "mosquitto_sub version 2.0.18 running on libmosquitto 2.0.18."
   - name: "mosquitto_pub in version 2.0.18 installed"
     command: "mosquitto_pub"
     args: ["--help"]
+    exitCode: 1
     expectedOutput:
     - "mosquitto_pub version 2.0.18 running on libmosquitto 2.0.18."
   - name: "strace in version 6.9 installed"
