@@ -134,7 +134,7 @@ jobs:
       - name: Run container-structure-tests
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: ghcr.io/${{ github.repository }}@{{ steps.build-image.outputs.digest }}
+          image: ghcr.io/${{ github.repository }}@${{ steps.build-image.outputs.digest }}
           config: test/container-structure-test/tests.yml
 
       # Run container-structure-test
