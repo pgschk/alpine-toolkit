@@ -1,20 +1,20 @@
 schemaVersion: 2.0.0
 commandTests:
-  - name: "telnet in version 2.5 installed"
+  - name: "telnet in version 2.6 installed"
     command: "telnet"
     args: ["-V"]
     expectedOutput:
-    - "2.5"
-  - name: "netcat in version 1.226 installed"
+    - "2.6"
+  - name: "netcat in version 1.229 installed"
     command: "nc"
     args: ["-h"]
     expectedError:
-    - "OpenBSD netcat \\(Debian patchlevel 1.226-1.1\\)"
-  - name: "curl in version 8.11.1 installed"
+    - "OpenBSD netcat \\(Debian patchlevel 1.229-1\\)"
+  - name: "curl in version 8.14.1 installed"
     command: "curl"
     args: ["-V"]
     expectedOutput:
-    - "curl 8.11.1"
+    - "curl 8.14.1"
   - name: "tcpdump in version 4.99.5 installed"
     command: "tcpdump"
     args: ["--version"]
