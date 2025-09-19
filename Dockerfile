@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=3.21@sha256:56fa17d2a7e7f168a043a2712e63aed1f8543aeafdcee47c58dcffe38ed51099
+ARG ALPINE_VERSION=3.22@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
 FROM alpine:${ALPINE_VERSION}
 
 ARG BASE_PACKAGES="nano openssl netcat-openbsd inetutils-telnet curl tcpdump"
