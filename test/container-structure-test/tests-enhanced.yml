@@ -5,35 +5,35 @@ commandTests:
     args: ["-V"]
     expectedOutput:
     - "2.6"
-  - name: "netcat in version 1.229 installed"
+  - name: "netcat in version 1.234 installed"
     command: "nc"
     args: ["-h"]
     expectedError:
-    - "OpenBSD netcat \\(Debian patchlevel 1.229-1\\)"
-  - name: "curl in version 8.14.1 installed"
+    - "OpenBSD netcat \\(Debian patchlevel 1.234-1\\)"
+  - name: "curl in version 8.17.0 installed"
     command: "curl"
     args: ["-V"]
     expectedOutput:
-    - "curl 8.14.1"
+    - "curl 8.17.0"
   - name: "tcpdump in version 4.99.5 installed"
     command: "tcpdump"
     args: ["--version"]
     expectedOutput:
     - "tcpdump version 4.99.5"
-  - name: "mosquitto_sub in version 2.0.21 installed"
+  - name: "mosquitto_sub in version 2.0.22 installed"
     command: "mosquitto_sub"
     args: ["--help"]
     exitCode: 1
     expectedOutput:
-    - "mosquitto_sub version 2.0.21 running on libmosquitto 2.0.21."
-  - name: "mosquitto_pub in version 2.0.21 installed"
+    - "mosquitto_sub version 2.0.22 running on libmosquitto 2.0.22."
+  - name: "mosquitto_pub in version 2.0.22 installed"
     command: "mosquitto_pub"
     args: ["--help"]
     exitCode: 1
     expectedOutput:
-    - "mosquitto_pub version 2.0.21 running on libmosquitto 2.0.21."
-  - name: "strace in version 6.13 installed"
+    - "mosquitto_pub version 2.0.22 running on libmosquitto 2.0.22."
+  - name: "strace in version 6.17 installed"
     command: "strace"
     args: ["-V"]
     expectedOutput:
-    - "strace -- version 6.13"
+    - "strace -- version 6.17"
