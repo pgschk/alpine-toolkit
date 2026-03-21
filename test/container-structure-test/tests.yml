@@ -5,16 +5,16 @@ commandTests:
     args: ["-V"]
     expectedOutput:
     - "2.6"
-  - name: "netcat in version 1.229 installed"
+  - name: "netcat in version 1.234 installed"
     command: "nc"
     args: ["-h"]
     expectedError:
-    - "OpenBSD netcat \\(Debian patchlevel 1.229-1\\)"
-  - name: "curl in version 8.14.1 installed"
+    - "OpenBSD netcat \\(Debian patchlevel 1.234-1\\)"
+  - name: "curl in version 8.17.0 installed"
     command: "curl"
     args: ["-V"]
     expectedOutput:
-    - "curl 8.14.1"
+    - "curl 8.17.0"
   - name: "tcpdump in version 4.99.5 installed"
     command: "tcpdump"
     args: ["--version"]
