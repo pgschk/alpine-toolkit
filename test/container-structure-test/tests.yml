@@ -10,11 +10,11 @@ commandTests:
     args: ["-h"]
     expectedError:
     - "OpenBSD netcat \\(Debian patchlevel 1.234-1\\)"
-  - name: "curl in version 8.17.0 installed"
+  - name: "curl in version 8.20.0 installed"
     command: "curl"
     args: ["-V"]
     expectedOutput:
-    - "curl 8.17.0"
+    - "curl 8.20.0"
   - name: "tcpdump in version 4.99.5 installed"
     command: "tcpdump"
     args: ["--version"]
