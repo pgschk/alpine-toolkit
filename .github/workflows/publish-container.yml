@@ -28,17 +28,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Login to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: docker.io
           username: ${{ github.actor }}
@@ -46,7 +46,7 @@ jobs:
 
       - name: Docker Metadata
         id: docker-metadata
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ${{ env.IMAGES }}
@@ -62,7 +62,7 @@ jobs:
 
       - name: Docker Metadata Extended image
         id: docker-metadata-extended
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ${{ env.IMAGES }}
@@ -81,17 +81,17 @@ jobs:
 
       - name: Read extended packages file
         id: get-extended-packages
-        run: echo "extended-packages=$(tr '\n' ' ' < EXTENDED_PACKAGES)" >> $GITHUB_OUTPUT
+        run: echo "extended-packages=$(tr '\n' ' ' < EXTENDED_PACKAGES)" >> "$GITHUB_OUTPUT"
 
       - name: Install QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Cache Docker layers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: /tmp/.buildx-cache/alpine-toolkit
           key: ${{ runner.os }}-buildx-alpine-toolkit
@@ -100,7 +100,7 @@ jobs:
 
       - name: Build container image
         id: build-image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
@@ -112,7 +112,7 @@ jobs:
 
       - name: Build extended container image
         id: build-image-extended
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
@@ -161,23 +161,23 @@ jobs:
 
     steps:
       - name: Login to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: docker.io
           username: pgschk
           password: ${{ secrets.DOCKER_LOGIN }}
 
-      - uses: sigstore/cosign-installer@v3
+      - uses: sigstore/cosign-installer@v4
 
       - name: Sign image
-        run: cosign sign --yes ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@${DIGEST}
+        run: cosign sign --yes ghcr.io/pgschk/alpine-toolkit@${DIGEST} docker.io/pgschk/alpine-toolkit@"${DIGEST}""
         env:
           DIGEST: ${{ needs.build.outputs.digest }}
           COSIGN_EXPERIMENTAL: 1
